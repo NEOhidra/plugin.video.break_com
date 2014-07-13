@@ -150,7 +150,7 @@ def showChannel(id, page):
                 result = test.text
                 break
             
-        # now tests for youtube url
+        # first tests for youtube url
         if result and result.find('?')>0:
             pos = result.find('?')
             pos+=1
@@ -158,7 +158,13 @@ def showChannel(id, page):
             value = args.get('v', None)
             if value and len(value)>=1:
                 result = "plugin://plugin.video.youtube/?path=/root/video&action=play_video&videoid=%s" % (value[0])
-            pass
+                
+        # second tests for youtube url
+        test = xml.find('ContentEmbedSourceName')
+        if test!=None and test.text=='YouTube':
+            test = xml.find('ThirdPartyUniqueId')
+            if test!=None:
+                result = "plugin://plugin.video.youtube/?path=/root/video&action=play_video&videoid=%s" % (test.text)
 
         return result
     
