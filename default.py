@@ -2,6 +2,8 @@
 
 import os
 import urllib2
+import urlparse
+ 
 try:
     from xml.etree import ElementTree as ET
 except ImportError:
@@ -32,8 +34,8 @@ __channel__ = [{'title': 'Featured Videos',
                 },
                ]
 
-import pydevd
-pydevd.settrace('localhost', stdoutToServer=True, stderrToServer=True)
+#import pydevd
+#pydevd.settrace('localhost', stdoutToServer=True, stderrToServer=True)
 
 __plugin__ = bromixbmc.Plugin()
 
@@ -106,13 +108,57 @@ def search():
 def showChannel(id, page):
     def _getBestVideoUrl(xml):
         result = None
+        
+        # first try to get the normal video urls
         test = xml.find('ContentURL')
         if test!=None:
             result = test.text
-        
         test = xml.find('VideoSource')
         if test!=None:
             result = test.text
+            
+        vq = __plugin__.getSettingAsInt('videoQuality', 1)
+        vh = 720
+        if vq==1:
+            vh=720
+        elif vq==0:
+            vh=480
+        else:
+            vh = 720
+
+        # try the media-group
+        try:
+            mediaGroup = xml.find('media-group')
+            if mediaGroup!=None:
+                oldHeight = 0
+                for mediaContent in mediaGroup:
+                    testHeight = int(mediaContent.get('height'))
+                    if testHeight>=oldHeight and testHeight<=vh:
+                        result = mediaContent.get('url')
+                        oldHeight = testHeight
+                    pass 
+                pass
+        except:
+            # do nothing
+            pass
+            
+        # try for direct tags
+        videoUrlList = ['Video%sURL' % (str(vh)), 'Video720URL', 'Video480URL']
+        for videoUrl in videoUrlList:
+            test = xml.find(videoUrl)
+            if test!=None:
+                result = test.text
+                break
+            
+        # now tests for youtube url
+        if result and result.find('?')>0:
+            pos = result.find('?')
+            pos+=1
+            args = urlparse.parse_qs(result[pos:])
+            value = args.get('v', None)
+            if value and len(value)>=1:
+                result = "plugin://plugin.video.youtube/?path=/root/video&action=play_video&videoid=%s" % (value[0])
+            pass
 
         return result
     
