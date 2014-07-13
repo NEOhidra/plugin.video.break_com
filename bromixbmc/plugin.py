@@ -89,18 +89,19 @@ class Plugin(object):
     def endOfDirectory(self, success=True):
         xbmcplugin.endOfDirectory(self._addon_handle, succeeded=success)
         
-    def setResolvedUrl(self, url):
+    def setResolvedUrl(self, url, isLiveStream=False):
         listitem = xbmcgui.ListItem(path=url)
         xbmcplugin.setResolvedUrl(self._addon_handle, True, listitem)
         
         # just to be sure :)
-        tries = 100
-        while tries>0:
-            xbmc.sleep(50)
-            if xbmc.Player().isPlaying() and xbmc.getCondVisibility("Player.Paused"):
-                xbmc.Player().pause()
-                break
-            tries-=1
+        if not isLiveStream:
+            tries = 100
+            while tries>0:
+                xbmc.sleep(50)
+                if xbmc.Player().isPlaying() and xbmc.getCondVisibility("Player.Paused"):
+                    xbmc.Player().pause()
+                    break
+                tries-=1
             
     def _loadFavs(self):
         favs = {'favs': {}}
