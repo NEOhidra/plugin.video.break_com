@@ -49,6 +49,7 @@ __ICON_SEARCH__ = os.path.join(__plugin__.getPath(), "resources/media/search.png
 __ACTION_SHOW_CHANNEL__ = 'showChannel'
 __ACTION_PLAY__ = 'play'
 __ACTION_SEARCH__ = 'search'
+__ACTION_SEARCH_PAGE__ = 'searchPage'
 
 def _getChannelContentXml(id, page):
     result = None
@@ -79,6 +80,20 @@ def _getChannelContentXml(id, page):
     
     return result
 
+def _getSearch(text, page):
+    url = "http://www.break.com/content/find?format=xml&safeSearch=true&isMobile=true&q=%s&pageSize=25&page=%s&youtube=true" % (text.encode('utf-8'), str(page))
+    opener = urllib2.build_opener()
+    opener.addheaders = [('User-Agent', 'stagefright/1.2 (Linux;Android 4.4.2)')
+                         ]
+    try:
+        content = opener.open(url)
+        result = ET.XML(content.read())
+    except:
+        # do nothing
+        pass
+    
+    return result
+
 def showIndex():
     for channel in __channel__:
         params = {'action': __ACTION_SHOW_CHANNEL__,
@@ -91,28 +106,18 @@ def showIndex():
     
     __plugin__.endOfDirectory()
     
-def search():
-    success = False
-    
-    keyboard = bromixbmc.Keyboard(__plugin__.localize(30000))
-    if keyboard.doModal():
-        success = True
-        
-        search_string = keyboard.getText().replace(" ", "+")
-        #result = _request('/capi-2.0a/search', params = {'q': search_string})
-        #posts = result.get('posts', [])
-        #_listPosts(posts)
-        
-    __plugin__.endOfDirectory(success)
-    
-def showChannel(id, page):
-    def _getBestVideoUrl(xml):
+def _getBestVideoUrl(xml):
         result = None
         
         # first try to get the normal video urls
         test = xml.find('ContentURL')
         if test!=None:
             result = test.text
+            
+        test = xml.find('StandardResContentUrl')
+        if test!=None:
+            result = test.text
+            
         test = xml.find('VideoSource')
         if test!=None:
             result = test.text
@@ -143,7 +148,7 @@ def showChannel(id, page):
             pass
             
         # try for direct tags
-        videoUrlList = ['Video%sURL' % (str(vh)), 'Video720URL', 'Video480URL']
+        videoUrlList = ['Video%sURL' % (str(vh)), 'ContentUrlRes_%s' % (str(vh)), 'Video720URL', 'Video480URL', 'ContentUrlRes_480']
         for videoUrl in videoUrlList:
             test = xml.find(videoUrl)
             if test!=None:
@@ -168,6 +173,51 @@ def showChannel(id, page):
 
         return result
     
+def _listSearchResult(xml, text, page):
+    searchResults = xml.find('SearchResults')
+    totalPages = int(xml.find('TotalPages').text)
+    if searchResults!=None:
+        for searchresult in searchResults:
+            contentName = searchresult.find('Title').text
+            contentId = searchresult.find('ContentID').text
+            contentPlot = searchresult.find('Description').text
+            contentThumb = searchresult.find('Thumbnail').text
+            videoUrl = _getBestVideoUrl(searchresult)
+            
+            params = {'action': __ACTION_PLAY__,
+                      'url': videoUrl
+                      }
+            infoLabels = {'plot': contentPlot}
+            __plugin__.addVideoLink(name=contentName, params=params, thumbnailImage=contentThumb, fanart=__FANART__, infoLabels=infoLabels)
+        
+        if page < totalPages:
+            params = {'action': __ACTION_SEARCH_PAGE__,
+                      'query': text.encode('utf-8'),
+                      'page': str(page+1)
+                      }
+            __plugin__.addDirectory(__plugin__.localize(30001)+' ('+str(page+1)+')', params=params, fanart=__FANART__)
+        
+    __plugin__.endOfDirectory()
+    
+def searchPage(text, page):
+    xml = _getSearch(text, page)
+    _listSearchResult(xml, text, page)
+    __plugin__.endOfDirectory()
+    
+def search():
+    success = False
+    
+    keyboard = bromixbmc.Keyboard(__plugin__.localize(30000))
+    if keyboard.doModal():
+        success = True
+        
+        search_string = keyboard.getText().replace(" ", "+")
+        xml = _getSearch(search_string, 1)
+        _listSearchResult(xml, search_string, 1)
+        
+    __plugin__.endOfDirectory(success)
+    
+def showChannel(id, page):
     xml = _getChannelContentXml(id, page)
     if xml:
         pageCount = 0
@@ -210,6 +260,7 @@ action = bromixbmc.getParam('action')
 id = bromixbmc.getParam('id')
 page = int(bromixbmc.getParam('page', '1'))
 url = bromixbmc.getParam('url')
+query = bromixbmc.getParam('query', '').decode('utf-8')
 
 if action == __ACTION_SHOW_CHANNEL__ and id:
     showChannel(id, page)
@@ -217,5 +268,7 @@ elif action == __ACTION_PLAY__ and url:
     play(url)
 elif action == __ACTION_SEARCH__:
     search()
+elif action == __ACTION_SEARCH_PAGE__ and query and page:
+    searchPage(query, page)
 else:
     showIndex()
