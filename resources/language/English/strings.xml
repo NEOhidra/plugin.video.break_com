@@ -3,4 +3,10 @@
 	<!-- Global strings -->
 	<string id="30000">Search</string>
 	<string id="30001">Next Page</string>
+	
+	<!-- Settings -->
+	<string id="30500">Show fanart</string>
+	<string id="30501">Video quality</string>
+	<string id="30502">SD</string>
+	<string id="30503">HD (720p)</string>
 </strings>

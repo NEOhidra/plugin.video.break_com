@@ -1,4 +1,7 @@
 """
+Version 2.0.3 (2014.07.13)
+- ADD: getSettingAsInt
+
 Version 2.0.2 (2014.07.10)
 - FIX: Android won't return a valid language so I added a default value 
 

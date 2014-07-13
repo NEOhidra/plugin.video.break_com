@@ -32,12 +32,14 @@ __channel__ = [{'title': 'Featured Videos',
                 },
                ]
 
-#import pydevd
-#pydevd.settrace('localhost', stdoutToServer=True, stderrToServer=True)
+import pydevd
+pydevd.settrace('localhost', stdoutToServer=True, stderrToServer=True)
 
 __plugin__ = bromixbmc.Plugin()
 
 __FANART__ = os.path.join(__plugin__.getPath(), "fanart.jpg")
+if not __plugin__.getSettingAsBool('showFanart'):
+    __FANART__ = ''
 __ICON__ = os.path.join(__plugin__.getPath(), "icon.png")
 __ICON_HIGHLIGHTS__ = os.path.join(__plugin__.getPath(), "resources/media/highlight.png")
 __ICON_SEARCH__ = os.path.join(__plugin__.getPath(), "resources/media/search.png")
@@ -102,6 +104,18 @@ def search():
     __plugin__.endOfDirectory(success)
     
 def showChannel(id, page):
+    def _getBestVideoUrl(xml):
+        result = None
+        test = xml.find('ContentURL')
+        if test!=None:
+            result = test.text
+        
+        test = xml.find('VideoSource')
+        if test!=None:
+            result = test.text
+
+        return result
+    
     xml = _getChannelContentXml(id, page)
     if xml:
         pageCount = 0
@@ -117,10 +131,14 @@ def showChannel(id, page):
             contentThumb = content.find('ThumbNailURL').text
                  
             if contentId and contentName:
+                videoUrl = _getBestVideoUrl(content)
+                
                 params = {'action': __ACTION_PLAY__,
-                          'id': contentId
+                          'id': contentId,
+                          'url': videoUrl
                           }
                 infoLabels = {'plot': contentPlot}
+                
                 __plugin__.addVideoLink(name=contentName, params=params, infoLabels=infoLabels, thumbnailImage=contentThumb, fanart=__FANART__)
         
         if page<pageCount:
@@ -131,14 +149,20 @@ def showChannel(id, page):
             __plugin__.addDirectory(__plugin__.localize(30001)+' ('+str(page+1)+')', params=params, fanart=__FANART__)
     
     __plugin__.endOfDirectory()
+    
+def play(url):
+    __plugin__.setResolvedUrl(url)
 
 
 action = bromixbmc.getParam('action')
 id = bromixbmc.getParam('id')
 page = int(bromixbmc.getParam('page', '1'))
+url = bromixbmc.getParam('url')
 
 if action == __ACTION_SHOW_CHANNEL__ and id:
     showChannel(id, page)
+elif action == __ACTION_PLAY__ and url:
+    play(url)
 elif action == __ACTION_SEARCH__:
     search()
 else:

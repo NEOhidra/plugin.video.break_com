@@ -43,11 +43,20 @@ class Plugin(object):
     def getPath(self):
         return self._addon_path
     
-    def localize(self, id):
-        return self._addon.getLocalizedString(id)
+    def localize(self, text_id):
+        return self._addon.getLocalizedString(text_id)
     
     def getSettingAsBool(self, name):
         return self._addon.getSetting(name)=="true"
+    
+    def getSettingAsInt(self, name, default=-1):
+        try:
+            return int(self._addon.getSetting(name))
+        except:
+            # do nothing
+            pass
+        
+        return default
     
     def addDirectory(self, name, params={}, thumbnailImage='', fanart='', contextMenu=None):
         url = self.createUrl(params)
