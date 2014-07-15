@@ -20,6 +20,9 @@ __channel__ = [{'title': 'Featured Videos',
                {'title': 'Trailers',
                 'id': '531'
                 },
+               {'title': 'Games',
+                'id': '532'
+                },
                {'title': 'Sports',
                 'id': '533'
                 },
