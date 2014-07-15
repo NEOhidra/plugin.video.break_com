@@ -1,2 +1,7 @@
+1.0.0~alpha2
+- FIX: HTML encoding for displaying the plot
+- FIX: some video streams won't play
+- ADD: setContent('episodes')
+
 1.0.0~alpha
 - development and testing

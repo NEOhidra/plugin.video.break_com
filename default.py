@@ -177,7 +177,12 @@ def _getBestVideoUrl(xml):
             args = urlparse.parse_qs(result[pos:])
             value = args.get('v', None)
             if value!=None and len(value)>=1:
-                result = "plugin://plugin.video.youtube/?path=/root/video&action=play_video&videoid=%s" % (value[0])
+                value = value[0]
+                if value.find('#')>0:
+                    value = value.split('#')
+                    value = value[0]
+                    
+                result = "plugin://plugin.video.youtube/?path=/root/video&action=play_video&videoid=%s" % (value)
                 
         # second tests for youtube url
         test = xml.find('ContentEmbedSourceName')
@@ -248,6 +253,10 @@ def showChannel(id, page):
             
         for content in xml:
             contentName = content.find('ContentTitle').text
+            
+            if contentName.startswith('Joan Jett'):
+                x=0
+            
             contentId = content.find('ContentID').text
             contentPlot = bromixbmc.decodeHtmlText(content.find('ContentDescription').text)
             contentThumb = content.find('ThumbNailURL').text
