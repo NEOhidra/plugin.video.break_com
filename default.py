@@ -112,17 +112,27 @@ def showIndex():
 def _getBestVideoUrl(xml):
         result = None
         
+        token = xml.find('Token')
+        if token!=None and token.text!=None:
+            token = token.text
+        else:
+            token = None
+        
         # first try to get the normal video urls
         test = xml.find('ContentURL')
-        if test!=None:
+        if test!=None and test.text!=None:
             result = test.text
+            if token!=None:
+                result = result+'?'+token
             
         test = xml.find('StandardResContentUrl')
-        if test!=None:
+        if test!=None and test.text!=None:
             result = test.text
+            if token!=None:
+                result = result+'?'+token
             
         test = xml.find('VideoSource')
-        if test!=None:
+        if test!=None and test.text!=None:
             result = test.text
             
         vq = __plugin__.getSettingAsInt('videoQuality', 1)
@@ -154,8 +164,10 @@ def _getBestVideoUrl(xml):
         videoUrlList = ['Video%sURL' % (str(vh)), 'ContentUrlRes_%s' % (str(vh)), 'Video720URL', 'Video480URL', 'ContentUrlRes_480']
         for videoUrl in videoUrlList:
             test = xml.find(videoUrl)
-            if test!=None:
+            if test!=None and test.text!=None:
                 result = test.text
+                if token!=None:
+                    result = result+'?'+token
                 break
             
         # first tests for youtube url
@@ -164,26 +176,29 @@ def _getBestVideoUrl(xml):
             pos+=1
             args = urlparse.parse_qs(result[pos:])
             value = args.get('v', None)
-            if value and len(value)>=1:
+            if value!=None and len(value)>=1:
                 result = "plugin://plugin.video.youtube/?path=/root/video&action=play_video&videoid=%s" % (value[0])
                 
         # second tests for youtube url
         test = xml.find('ContentEmbedSourceName')
-        if test!=None and test.text=='YouTube':
+        if test!=None and test.text!=None and test.text=='YouTube':
             test = xml.find('ThirdPartyUniqueId')
-            if test!=None:
+            if test!=None and test.text!=None:
                 result = "plugin://plugin.video.youtube/?path=/root/video&action=play_video&videoid=%s" % (test.text)
 
         return result
     
 def _listSearchResult(xml, text, page):
+    __plugin__.setContent('episodes')
+    
     searchResults = xml.find('SearchResults')
     totalPages = int(xml.find('TotalPages').text)
     if searchResults!=None:
         for searchresult in searchResults:
             contentName = searchresult.find('Title').text
             contentId = searchresult.find('ContentID').text
-            contentPlot = searchresult.find('Description').text
+            
+            contentPlot = bromixbmc.decodeHtmlText(searchresult.find('Description').text)
             contentThumb = searchresult.find('Thumbnail').text
             videoUrl = _getBestVideoUrl(searchresult)
             
@@ -221,6 +236,8 @@ def search():
     __plugin__.endOfDirectory(success)
     
 def showChannel(id, page):
+    __plugin__.setContent('episodes')
+    
     xml = _getChannelContentXml(id, page)
     if xml:
         pageCount = 0
@@ -232,7 +249,7 @@ def showChannel(id, page):
         for content in xml:
             contentName = content.find('ContentTitle').text
             contentId = content.find('ContentID').text
-            contentPlot = content.find('ContentDescription').text
+            contentPlot = bromixbmc.decodeHtmlText(content.find('ContentDescription').text)
             contentThumb = content.find('ThumbNailURL').text
                  
             if contentId and contentName:

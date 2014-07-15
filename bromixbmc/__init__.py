@@ -1,4 +1,7 @@
 """
+Version 2.0.4 (2014.07.15)
+- ADD: decodeHtmlText(text) for decoding html escaped text
+
 Version 2.0.3 (2014.07.13)
 - ADD: getSettingAsInt
 
@@ -22,12 +25,17 @@ import locale
 import re
 import sys
 import urlparse
+import HTMLParser
 
 from plugin import Plugin
 from keyboard import Keyboard
 
 def stripHtmlFromText(text):
     return re.sub('<[^<]+?>', '', text)
+
+def decodeHtmlText(text):
+    hp = HTMLParser.HTMLParser()
+    return hp.unescape(text)
 
 def getParam(name, default=None):
     args = urlparse.parse_qs(sys.argv[2][1:])
