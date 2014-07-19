@@ -1,4 +1,5 @@
 1.0.0~alpha2
+- UPD: new icon
 - CHG: changed ID to 'plugin.video.bromix.break' 
 - FIX: HTML encoding for displaying the plot
 - FIX: some video streams won't play
