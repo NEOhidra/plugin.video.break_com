@@ -1,5 +1,6 @@
 1.0.0~alpha3
-- UPD: added icons for each channel 
+- ADD: requirement for the youtube add-on
+- UPD: added icons for each channel
 
 1.0.0~alpha2
 - UPD: new icon
