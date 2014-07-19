@@ -54,6 +54,13 @@ __ACTION_PLAY__ = 'play'
 __ACTION_SEARCH__ = 'search'
 __ACTION_SEARCH_PAGE__ = 'searchPage'
 
+def _getChannelIcon(id):
+    channelIcon = os.path.join(__plugin__.getPath(), "resources/media/%s.png" % (id))
+    if os.path.exists(channelIcon):
+        return channelIcon
+    
+    return __ICON__
+
 def _getChannelContentXml(id, page):
     result = None
     
@@ -101,7 +108,9 @@ def showIndex():
     for channel in __channel__:
         params = {'action': __ACTION_SHOW_CHANNEL__,
                   'id': channel['id']}
-        __plugin__.addDirectory(channel['title'], params=params, thumbnailImage=__ICON__, fanart=__FANART__)
+        
+        thumbnailImage = _getChannelIcon(channel['id'])
+        __plugin__.addDirectory(channel['title'], params=params, thumbnailImage=thumbnailImage, fanart=__FANART__)
         pass
     
     params = {'action': __ACTION_SEARCH__}
