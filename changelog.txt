@@ -1,3 +1,6 @@
+1.0.0~alpha4
+- ADD: support for galleries
+
 1.0.0~alpha3
 - ADD: requirement for the youtube add-on
 - UPD: added icons for each channel
