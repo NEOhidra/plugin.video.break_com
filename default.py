@@ -70,6 +70,8 @@ def _getChannelContentXml(id, page):
     url = 'http://api.break.com'
     if id=='-1':
         url+='/invoke/homepage/includeyoutube/'
+    elif id=='-2':
+        url+='/invoke/listgalleries/includegif/'
     else:
         url+='/invoke/channel/includeyoutube/'
         url+=id
@@ -252,10 +254,8 @@ def search():
         
     __plugin__.endOfDirectory(success)
     
-def showChannel(id, page):
+def _showVideos(xml):
     __plugin__.setContent('episodes')
-    
-    xml = _getChannelContentXml(id, page)
     if xml:
         pageCount = 0
         try:
@@ -290,7 +290,14 @@ def showChannel(id, page):
                       'page': str(page+1)
                       }
             __plugin__.addDirectory(__plugin__.localize(30001)+' ('+str(page+1)+')', params=params, fanart=__FANART__)
+
     
+def showChannel(id, page):
+    xml = _getChannelContentXml(id, page)
+    if xml!=None:
+        contentType = xml.get('Type', '')
+        if contentType=='ContentByChannel' or contentType=='HomePage':
+            _showVideos(xml)    
     __plugin__.endOfDirectory()
     
 def play(url):
