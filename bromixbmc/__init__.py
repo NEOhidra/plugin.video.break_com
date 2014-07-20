@@ -1,4 +1,11 @@
 """
+Version 2.0.6 (2014.07.20)
+- ADD: addImage(...)
+
+Version 2.0.5 (2014.07.19)
+- ADD: executebuiltin(function)
+- ADD: addSortMethod(sort_method) for add sorting
+
 Version 2.0.4 (2014.07.15)
 - ADD: decodeHtmlText(text) for decoding html escaped text
 
@@ -27,8 +34,20 @@ import sys
 import urlparse
 import HTMLParser
 
+import xbmc
+
 from plugin import Plugin
 from keyboard import Keyboard
+
+def getFormatDateShort(year, month, day):
+    date_format = xbmc.getRegion('dateshort')
+    date_format = date_format.replace('%d', day)
+    date_format = date_format.replace('%m', month)
+    date_format = date_format.replace('%Y', year)
+    return date_format
+
+def executebuiltin(function):
+    xbmc.executebuiltin(function)
 
 def stripHtmlFromText(text):
     return re.sub('<[^<]+?>', '', text)
