@@ -274,7 +274,7 @@ def search():
     
 def _showVideos(xml, id, page):
     __plugin__.setContent('episodes')
-    if xml:
+    if xml!=None:
         pageCount = 0
         try:
             pageCount = int(xml.get('PageCount'))
@@ -307,7 +307,7 @@ def _showVideos(xml, id, page):
             __plugin__.addDirectory(__plugin__.localize(30001)+' ('+str(page+1)+')', params=params, fanart=__FANART__)
             
 def _showPicture(xml, id, page):
-    if xml:
+    if xml!=None:
         pageCount = 0
         try:
             pageCount = int(xml.get('PageCount'))
@@ -352,7 +352,7 @@ def play(url):
     
 def showGallery(id, page, contentCount):
     xml = _getGalleryContentXml(id, page, contentCount)
-    if xml:
+    if xml!=None:
         for content in xml:
             contentId = content.find('ContentID').text
             contentTitle = content.find('ContentTitle').text
