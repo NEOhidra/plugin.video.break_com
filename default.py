@@ -14,6 +14,9 @@ import bromixbmc
 __channel__ = [{'title': 'Featured Videos',
                 'id': '-1'
                 },
+               {'title': 'Galleries',
+                'id': '-2'
+                },
                {'title': 'Pranks & Fails',
                 'id': '534'
                 },
