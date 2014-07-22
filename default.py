@@ -35,6 +35,9 @@ __channel__ = [{'title': 'Featured Videos',
                {'title': 'All the animals',
                 'id': '535'
                 },
+               {'title': 'Super Funny Videos',
+                'id': '538'
+                },
                ]
 
 #import pydevd
@@ -53,13 +56,6 @@ __ACTION_SHOW_CHANNEL__ = 'showChannel'
 __ACTION_PLAY__ = 'play'
 __ACTION_SEARCH__ = 'search'
 __ACTION_SEARCH_PAGE__ = 'searchPage'
-
-def _getChannelIcon(channel_id):
-    channelIcon = os.path.join(__plugin__.getPath(), "resources/media/%s.png" % (channel_id))
-    if os.path.exists(channelIcon):
-        return channelIcon
-    
-    return __ICON__
 
 def _getChannelContentXml(channel_id, page):
     result = None
@@ -109,8 +105,7 @@ def showIndex():
         params = {'action': __ACTION_SHOW_CHANNEL__,
                   'id': channel['id']}
         
-        thumbnailImage = _getChannelIcon(channel['id'])
-        __plugin__.addDirectory(channel['title'], params=params, thumbnailImage=thumbnailImage, fanart=__FANART__)
+        __plugin__.addDirectory(channel['title'], params=params, thumbnailImage=__ICON__, fanart=__FANART__)
         pass
     
     params = {'action': __ACTION_SEARCH__}
