@@ -14,9 +14,6 @@ import bromixbmc
 __channel__ = [{'title': 'Featured Videos',
                 'id': '-1'
                 },
-               {'title': 'Galleries',
-                'id': '-2'
-                },
                {'title': 'Pranks & Fails',
                 'id': '534'
                 },
@@ -54,52 +51,32 @@ __ICON_SEARCH__ = os.path.join(__plugin__.getPath(), "resources/media/search.png
 
 __ACTION_SHOW_CHANNEL__ = 'showChannel'
 __ACTION_PLAY__ = 'play'
-__ACTION_SHOW_GALLERY__ = 'showGallery'
 __ACTION_SEARCH__ = 'search'
 __ACTION_SEARCH_PAGE__ = 'searchPage'
 
-def _getChannelIcon(id):
-    channelIcon = os.path.join(__plugin__.getPath(), "resources/media/%s.png" % (id))
+def _getChannelIcon(channel_id):
+    channelIcon = os.path.join(__plugin__.getPath(), "resources/media/%s.png" % (channel_id))
     if os.path.exists(channelIcon):
         return channelIcon
     
     return __ICON__
 
-def _getChannelContentXml(id, page):
+def _getChannelContentXml(channel_id, page):
     result = None
     
     url = 'http://api.break.com'
-    if id=='-1':
+    if channel_id=='-1':
         url+='/invoke/homepage/includeyoutube/'
-    elif id=='-2':
-        url+='/invoke/listgalleries/includegif/'
     else:
         url+='/invoke/channel/includeyoutube/'
-        url+=id
+        url+=channel_id
         url+='/'
         
     url+=str(page)+'/'
     url+='25/'
     
-    if id!='-1' and id!='-2':
+    if channel_id!='-1':
         url+='PG/'
-    
-    opener = urllib2.build_opener()
-    opener.addheaders = [('User-Agent', 'stagefright/1.2 (Linux;Android 4.4.2)')
-                         ]
-    try:
-        content = opener.open(url)
-        result = ET.XML(content.read())
-    except:
-        # do nothing
-        pass
-    
-    return result
-
-def _getGalleryContentXml(id, page, contentCount):
-    result = None
-    
-    url = 'http://api.break.com/invoke/gallery/includegif/%s/%s/%s/' % (id, page, contentCount)
     
     opener = urllib2.build_opener()
     opener.addheaders = [('User-Agent', 'stagefright/1.2 (Linux;Android 4.4.2)')
@@ -233,7 +210,6 @@ def _listSearchResult(xml, text, page):
     if searchResults!=None:
         for searchresult in searchResults:
             contentName = searchresult.find('Title').text
-            contentId = searchresult.find('ContentID').text
             
             contentPlot = bromixbmc.decodeHtmlText(searchresult.find('Description').text)
             contentThumb = searchresult.find('Thumbnail').text
@@ -272,8 +248,10 @@ def search():
         
     __plugin__.endOfDirectory(success)
     
-def _showVideos(xml, id, page):
+def showChannel(channel_id, page):
     __plugin__.setContent('episodes')
+    
+    xml = _getChannelContentXml(channel_id, page)
     if xml!=None:
         pageCount = 0
         try:
@@ -301,81 +279,24 @@ def _showVideos(xml, id, page):
         
         if page<pageCount:
             params = {'action': __ACTION_SHOW_CHANNEL__,
-                      'id': id,
+                      'id': channel_id,
                       'page': str(page+1)
                       }
             __plugin__.addDirectory(__plugin__.localize(30001)+' ('+str(page+1)+')', params=params, fanart=__FANART__)
-            
-def _showPicture(xml, id, page):
-    if xml!=None:
-        pageCount = 0
-        try:
-            pageCount = int(xml.get('PageCount'))
-        except:
-            pageCount = 1
-            
-        for content in xml:
-            contentName = content.find('ContentTitle').text
-            
-            contentId = content.find('ContentID').text
-            contentPlot = bromixbmc.decodeHtmlText(content.find('ContentDescription').text)
-            contentThumb = content.find('ContentStaticURL').text
-            contentCount = content.find('ChildContentCount').text
-                 
-            if contentId and contentName:
-                params = {'action': __ACTION_SHOW_GALLERY__,
-                          'id': contentId,
-                          'contentcount': contentCount
-                          }
-                __plugin__.addDirectory(name=contentName, params=params, thumbnailImage=contentThumb, fanart=__FANART__)
-        
-        if page<pageCount:
-            params = {'action': __ACTION_SHOW_CHANNEL__,
-                      'id': id,
-                      'page': str(page+1)
-                      }
-            __plugin__.addDirectory(__plugin__.localize(30001)+' ('+str(page+1)+')', params=params, fanart=__FANART__)
-    
-def showChannel(id, page):
-    xml = _getChannelContentXml(id, page)
-    if xml!=None:
-        contentType = xml.get('Type', '')
-        if contentType=='ContentByChannel' or contentType=='HomePage':
-            _showVideos(xml, id, page)
-        elif contentType=='GalleryList':
-            _showPicture(xml, id, page)
 
     __plugin__.endOfDirectory()
     
 def play(url):
     __plugin__.setResolvedUrl(url)
     
-def showGallery(id, page, contentCount):
-    xml = _getGalleryContentXml(id, page, contentCount)
-    if xml!=None:
-        for content in xml:
-            contentId = content.find('ContentID').text
-            contentTitle = content.find('ContentTitle').text
-            image = content.find('ContentStaticURL').text
-            
-            __plugin__.addImage(name=contentTitle, image_url=image, fanart=__FANART__)
-            pass 
-        pass
-    
-    __plugin__.endOfDirectory()
-
-
 action = bromixbmc.getParam('action')
-id = bromixbmc.getParam('id')
+channel_id = bromixbmc.getParam('id')
 page = int(bromixbmc.getParam('page', '1'))
 url = bromixbmc.getParam('url')
-contentCount = bromixbmc.getParam('contentcount')
 query = bromixbmc.getParam('query', '').decode('utf-8')
 
-if action == __ACTION_SHOW_CHANNEL__ and id:
-    showChannel(id, page)
-elif action == __ACTION_SHOW_GALLERY__ and contentCount!=None and id!=None:
-    showGallery(id, page, contentCount)
+if action == __ACTION_SHOW_CHANNEL__ and channel_id:
+    showChannel(channel_id, page)
 elif action == __ACTION_PLAY__ and url:
     play(url)
 elif action == __ACTION_SEARCH__:
