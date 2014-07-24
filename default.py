@@ -206,7 +206,7 @@ def _listSearchResult(xml, text, page):
         for searchresult in searchResults:
             contentName = searchresult.find('Title').text
             
-            contentPlot = bromixbmc.decodeHtmlText(searchresult.find('Description').text)
+            contentPlot = bromixbmc.stripHtmlFromText(bromixbmc.decodeHtmlText(searchresult.find('Description').text))
             contentThumb = searchresult.find('Thumbnail').text
             videoUrl = _getBestVideoUrl(searchresult)
             
@@ -258,7 +258,7 @@ def showChannel(channel_id, page):
             contentName = content.find('ContentTitle').text
             
             contentId = content.find('ContentID').text
-            contentPlot = bromixbmc.decodeHtmlText(content.find('ContentDescription').text)
+            contentPlot = bromixbmc.stripHtmlFromText(bromixbmc.decodeHtmlText(content.find('ContentDescription').text))
             contentThumb = content.find('ThumbNailURL').text
                  
             if contentId and contentName:
