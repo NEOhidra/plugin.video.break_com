@@ -1,4 +1,7 @@
 """
+Version 2.0.7 (2014.07.25)
+- ADD: addImage(...) will also set the setInfo('pictures'...) info labels
+
 Version 2.0.6 (2014.07.20)
 - ADD: addImage(...)
 

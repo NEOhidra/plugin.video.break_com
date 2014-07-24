@@ -123,6 +123,8 @@ class Plugin(object):
         if contextMenu!=None:
             item.addContextMenuItems(contextMenu);
             
+        item.setInfo(type="pictures", infoLabels={'title': name})
+            
         return xbmcplugin.addDirectoryItem(handle=self._addon_handle,url=image_url,listitem=item)
     
     def addVideoLink(self, name, params={}, thumbnailImage='', fanart='', infoLabels={}):

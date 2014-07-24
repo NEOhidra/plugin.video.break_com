@@ -1,5 +1,6 @@
 1.0.0
 - remove all kinds of HTML-Tags for clean descriptions
+- updated bromixbmc
 - removed beta status
 
 1.0.0~beta2
