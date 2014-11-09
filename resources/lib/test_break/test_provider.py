@@ -7,6 +7,15 @@ import unittest
 
 
 class TestProvider(unittest.TestCase):
+    def test_feed(self):
+        provider = Provider()
+
+        result = provider.navigate('/feed/40/')
+        items = result[0]
+
+        kodimon.print_items(items)
+        pass
+
     def test_on_root(self):
         provider = Provider()
 

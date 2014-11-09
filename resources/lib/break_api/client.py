@@ -6,7 +6,16 @@ __author__ = 'bromix'
 
 class Client(object):
     def __init__(self):
+        self._page_size = 25
         pass
+
+    def get_feed(self, feed_id, page=1):
+        api_request_json = {
+            'requestedProperties': ["title", "description", "contentType", "contentSubType", "thumbnails", "viewCount",
+                                    "mediaFiles", "contentPartnerName", "prerollAllowed"],
+            'id': feed_id,'pageSize': self._page_size, 'pageNumber': page}
+        params = {'apiRequestJson': json.dumps(api_request_json)}
+        return self._perform_request(path='/content/contentfeed/get', params=params)
 
     def get_home(self):
         api_request_json = {'id': 12}
