@@ -14,6 +14,9 @@ class Provider(kodimon.AbstractProvider):
         self._client = Client()
         pass
 
+    def get_fanart(self):
+        return self.create_resource_path('media', 'fanart.jpg')
+
     def _feed_to_item(self, json_data):
         result = []
 
