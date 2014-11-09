@@ -68,7 +68,7 @@ class Provider(kodimon.AbstractProvider):
     def on_root(self, path, params, re_match):
         result = []
 
-        json_data = self._client.get_home()
+        json_data = self.get_function_cache().get(FunctionCache.ONE_DAY, self._client.get_home)
         collection = json_data['data']['data']['collection']
         for item in collection:
             title = item['name']

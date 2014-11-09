@@ -70,7 +70,7 @@ def _set_resolved_url(plugin, base_item, succeeded=True):
             xbmc.sleep(50)
             if xbmc.Player().isPlaying() and xbmc.getCondVisibility("Player.Paused"):
                 xbmc.Player().pause()
-                break_api
+                break
             tries-=1
     """
 
