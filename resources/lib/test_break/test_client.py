@@ -6,6 +6,16 @@ import unittest
 
 
 class TestClient(unittest.TestCase):
+    def test_get_video_url(self):
+        client = Client()
+        url = client.get_video_url(2784704)
+        pass
+
+    def test_get_video(self):
+        client = Client()
+        json_data = client.get_video(2784704)
+        pass
+
     def test_get_feed(self):
         client = Client()
         json_data = client.get_feed(40)

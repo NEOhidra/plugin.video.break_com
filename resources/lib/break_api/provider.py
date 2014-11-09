@@ -20,7 +20,7 @@ class Provider(kodimon.AbstractProvider):
         data = json_data['data']['data']
         for item in data:
             video_item = VideoItem(item['title'],
-                                   self.create_uri(['play']))
+                                   self.create_uri(['play', str(item['id'])]))
             video_item.set_fanart(self.get_fanart())
             video_item.set_plot(item['description'])
             image = item.get('thumbnails', [])
@@ -32,6 +32,16 @@ class Provider(kodimon.AbstractProvider):
             pass
 
         return result
+
+    @kodimon.RegisterPath('^/play/(?P<video_id>.*)/$')
+    def _on_play(self, path, params, re_match):
+        vq = self.get_settings().get_video_quality()
+
+        video_id = re_match.group('video_id')
+        video_url = self._client.get_video_url(video_id, vq)
+        video_item = VideoItem(video_id,
+                               video_url)
+        return video_item
 
     @kodimon.RegisterPath('^/feed/(?P<feed_id>.*)/$')
     def _on_feed(self, path, params, re_match):
