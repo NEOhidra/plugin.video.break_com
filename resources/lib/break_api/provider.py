@@ -68,6 +68,7 @@ class Provider(kodion.AbstractProvider):
         next_page_result = self._feed_to_item(json_data, context)
         if len(next_page_result) > 0:
             next_page_item = kodion.items.create_next_page_item(context, page, path, params)
+            next_page_item.set_fanart(self.get_fanart(context))
             result.append(next_page_item)
             pass
 
