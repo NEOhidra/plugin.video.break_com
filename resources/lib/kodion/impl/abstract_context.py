@@ -74,6 +74,9 @@ class AbstractContext(object):
     def get_ui(self):
         raise NotImplementedError()
 
+    def get_system_version(self):
+        raise NotImplementedError()
+
     def create_uri(self, path=u'/', params=None):
         if not params:
             params = {}
@@ -105,6 +108,9 @@ class AbstractContext(object):
 
     def get_params(self):
         return self._params
+
+    def get_param(self, name, default=None):
+        return self.get_params().get(name, default)
 
     def get_data_path(self):
         """
@@ -151,7 +157,7 @@ class AbstractContext(object):
     def set_content_type(self, content_type):
         raise NotImplementedError()
 
-    def add_sort_method(self, sort_method):
+    def add_sort_method(self, *sort_methods):
         raise NotImplementedError()
 
     def log(self, text, log_level=constants.log.NOTICE):

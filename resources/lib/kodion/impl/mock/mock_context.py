@@ -5,6 +5,7 @@ import tempfile
 from ..abstract_context import AbstractContext
 from .mock_settings import MockSettings
 from .mock_context_ui import MockContextUI
+from .mock_system_version import MockSystemVersion
 from ...logging import log
 
 
@@ -18,7 +19,11 @@ class MockContext(AbstractContext):
                                    5001: u'MOCK Plugin'}
 
         self._ui = None
+        self._system_version = MockSystemVersion(0, 0, 'Kodion Test System')
         pass
+
+    def get_system_version(self):
+        return self._system_version
 
     def get_ui(self):
         if not self._ui:
@@ -45,8 +50,10 @@ class MockContext(AbstractContext):
         log("Set ContentType to '%s'" % content_type)
         pass
 
-    def add_sort_method(self, sort_method):
-        log("add SortMethod '%s'" % (str(sort_method)))
+    def add_sort_method(self, *sort_methods):
+        for sort_method in sort_methods:
+            log("add SortMethod '%s'" % (str(sort_method)))
+            pass
         pass
 
     def clone(self, new_path=None, new_params=None):
@@ -58,6 +65,15 @@ class MockContext(AbstractContext):
             new_params = self.get_params()
             pass
 
-        return MockContext(path=new_path, params=new_params, plugin_name=self._plugin_name, plugin_id=self._plugin_id)
+        new_context = MockContext(path=new_path, params=new_params, plugin_name=self._plugin_name,
+                                  plugin_id=self._plugin_id)
+
+        new_context._function_cache = self._function_cache
+        new_context._search_history = self._search_history
+        new_context._favorite_list = self._favorite_list
+        new_context._watch_later_list = self._watch_later_list
+        new_context._access_manager = self._access_manager
+
+        return new_context
 
     pass
