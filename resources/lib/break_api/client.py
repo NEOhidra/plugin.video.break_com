@@ -1,5 +1,6 @@
 import json
-import requests
+
+from resources.lib.kodion import simple_requests as requests
 
 __author__ = 'bromix'
 
@@ -37,8 +38,8 @@ class Client(object):
 
     def get_video(self, video_id):
         headers = {'Content-Type': 'application/json'}
-        post_data = json.dumps({'id': int(video_id)})
-        return self._perform_request(method='POST', path='/content/video/get', post_data=post_data, headers=headers)
+        json_data = {'id': int(video_id)}
+        return self._perform_request(method='POST', path='/content/video/get', json=json_data, headers=headers)
 
     def get_feed(self, feed_id, page=1):
         api_request_json = {
@@ -54,7 +55,7 @@ class Client(object):
         return self._perform_request(path='/content/FeedQuery/GetFeedCollection', params=params)
 
     def _perform_request(self, method='GET', headers=None, path=None, post_data=None, params=None,
-                         allow_redirects=True):
+                         allow_redirects=True, json=None):
         # params
         if not params:
             params = {}
@@ -79,8 +80,14 @@ class Client(object):
         if method == 'GET':
             result = requests.get(_url, params=_params, headers=_headers, verify=False, allow_redirects=allow_redirects)
         elif method == 'POST':
-            result = requests.post(_url, data=post_data, params=_params, headers=_headers, verify=False,
-                                   allow_redirects=allow_redirects)
+            if post_data:
+                result = requests.post(_url, data=post_data, params=_params, headers=_headers, verify=False,
+                                       allow_redirects=allow_redirects)
+                pass
+            elif json:
+                result = requests.post(_url, json=json, params=_params, headers=_headers, verify=False,
+                                       allow_redirects=allow_redirects)
+                pass
 
         if result is None:
             return {}
