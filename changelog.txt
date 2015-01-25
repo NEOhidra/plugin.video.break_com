@@ -1,5 +1,5 @@
-2.0.1~beta1 (2015-01-25)
-UPD: kodion
+2.0.1 (2015-01-25)
+UPD: dropped dependency of 'requests'-module because of performance issues
 
 2.0.0 (2014-11-27)
 FIX: skins call '/extrafanart/'
