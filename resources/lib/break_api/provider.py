@@ -43,11 +43,14 @@ class Provider(kodion.AbstractProvider):
 
     @kodion.RegisterProviderPath('^/play/(?P<video_id>.*)/$')
     def _on_play(self, context, re_match):
-        vq = context.get_settings().get_video_quality()
+        def _compare(item):
+            vq = context.get_settings().get_video_quality()
+            return vq - item['height']
 
         video_id = re_match.group('video_id')
-        video_url = self._client.get_video_url(video_id, vq)
-        uri_item = UriItem(video_url)
+        video_urls = self._client.get_video_urls(video_id)
+        video_url = kodion.utils.find_best_fit(video_urls, _compare)
+        uri_item = UriItem(video_url['url'])
         return uri_item
 
     @kodion.RegisterProviderPath('^/feed/(?P<feed_id>.*)/$')

@@ -1,8 +1,7 @@
-import json
-
-from resources.lib.kodion import simple_requests as requests
-
 __author__ = 'bromix'
+
+import json
+from resources.lib.kodion import simple_requests as requests
 
 
 class Client(object):
@@ -10,34 +9,41 @@ class Client(object):
         self._page_size = 25
         pass
 
-    def get_video_url(self, video_id, max_video_quality=720):
+    def get_video_urls(self, video_id):
+        def _sort(x):
+            return x['height']
+
+        streams = []
         json_data = self.get_video(video_id)
         data = json_data['data']
         hls_uri = data['hlsUri']
         if hls_uri:
             token = data['token']
 
-            bit_rates = []
             media_files = data['mediaFiles']
             for media_file in media_files:
                 # someone switched the values
                 height = int(media_file['width'])
                 bit_rate = str(media_file['bitRate'])
-                if len(bit_rate) <= 4 and height <= max_video_quality:
-                    bit_rates.append(bit_rate)
-                    pass
-                pass
-            bit_rates = ','.join(bit_rates)
 
-            url = '%s,%s,_kbps.mp4.m3u8?%s' % (hls_uri, bit_rates, token)
-            return url
+                url = '%s%s_kbps.mp4.m3u8?%s' % (hls_uri, bit_rate, token)
+                streams.append({'height': height,
+                                'url': url})
+                pass
+
+            streams = sorted(streams, key=_sort, reverse=True)
+            return streams
 
         # try youtube
         youtube_video_id = data['thirdPartyUniqueId']
-        return 'plugin://plugin.video.youtube/?action=play_video&videoid=' + youtube_video_id
+        return [{'height': 480,
+                 'url': 'plugin://plugin.video.youtube/?action=play_video&videoid=' + youtube_video_id}]
 
     def get_video(self, video_id):
         headers = {'Content-Type': 'application/json'}
+        params = {'siteName': 'Break',
+                  'appName': 'Android Phones',
+                  'siteId': '1'}
         json_data = {'id': int(video_id)}
         return self._perform_request(method='POST', path='/content/video/get', json=json_data, headers=headers)
 
