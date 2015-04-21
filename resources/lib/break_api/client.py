@@ -23,12 +23,12 @@ class Client(object):
             media_files = data['mediaFiles']
             for media_file in media_files:
                 # someone switched the values
-                height = int(media_file['width'])
+                height = int(media_file['height'])
                 bit_rate = str(media_file['bitRate'])
 
-                url = '%s%s_kbps.mp4.m3u8?%s' % (hls_uri, bit_rate, token)
+                #url = '%s%s_kbps.mp4.m3u8?%s' % (hls_uri, bit_rate, token)
                 streams.append({'height': height,
-                                'url': url})
+                                'url': media_file['uri']})
                 pass
 
             streams = sorted(streams, key=_sort, reverse=True)
@@ -45,7 +45,7 @@ class Client(object):
                   'appName': 'Android Phones',
                   'siteId': '1'}
         json_data = {'id': int(video_id)}
-        return self._perform_request(method='POST', path='/content/video/get', json=json_data, headers=headers)
+        return self._perform_request(method='POST', path='/content/video/get', params=params, json=json_data, headers=headers)
 
     def get_feed(self, feed_id, page=1):
         api_request_json = {
