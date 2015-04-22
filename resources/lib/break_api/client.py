@@ -37,7 +37,7 @@ class Client(object):
         # try youtube
         youtube_video_id = data['thirdPartyUniqueId']
         return [{'height': 480,
-                 'url': 'plugin://plugin.video.youtube/?action=play_video&videoid=' + youtube_video_id}]
+                 'url': 'plugin://plugin.video.youtube/play/?video_id=' + youtube_video_id}]
 
     def get_video(self, video_id):
         headers = {'Content-Type': 'application/json'}
