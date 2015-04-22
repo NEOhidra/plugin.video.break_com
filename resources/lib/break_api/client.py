@@ -76,6 +76,7 @@ class Client(object):
 
         _headers = {'Host': 'api.breakmedia.com',
                     'Connection': 'Keep-Alive',
+                    'Accept-Encoding': 'gzip',
                     'User-Agent': ''}
         _headers.update(headers)
 
