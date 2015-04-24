@@ -11,6 +11,11 @@ class TestClient(unittest.TestCase):
         url = client.get_video_urls(2848412)
         pass
 
+    def test_search(self):
+        client = Client()
+        xml = client.search('superman')
+        pass
+
     def test_get_video(self):
         client = Client()
         json_data = client.get_video(2608653)
