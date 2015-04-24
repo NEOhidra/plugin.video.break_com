@@ -47,6 +47,8 @@ class Client(object):
         json_data = {'id': int(video_id)}
         return self._perform_request(method='POST', path='/content/video/get', params=params, json=json_data, headers=headers)
 
+
+
     def get_feed(self, feed_id, page=1):
         api_request_json = {
             'requestedProperties': ["title", "description", "contentType", "contentSubType", "thumbnails", "viewCount",
@@ -99,6 +101,13 @@ class Client(object):
         if result is None:
             return {}
 
-        return result.json()
+        headers = result.headers
+        if 'content-type' in headers:
+            content_type = headers['content-type']
+            if content_type.lower().startswith('application/json'):
+                return result.json()
+            pass
+
+        return result.text
 
     pass
