@@ -15,9 +15,9 @@
 		<disclaimer lang="en"></disclaimer>
 		<platform>all</platform>
 		<license>GNU General Public License v2.0</license>
-		<forum></forum>
+		<forum>http://forum.kodi.tv/showthread.php?tid=225052</forum>
 		<website>www.break.com</website>
-        <email>kodi at bromix dot org</email>
+		<email>kodi at bromix dot org</email>
 		<source>https://github.com/bromix/plugin.video.break_com</source>
 	</extension>
 </addon>
